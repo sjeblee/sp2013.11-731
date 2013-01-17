@@ -1,7 +1,7 @@
 ---
 name:
-   first: Chris
-   last: Dyer
-email: cdyer@cs.cmu.edu
-leaderboard: ProfDyer
-languages: [eng,deu]
+   first: Serena
+   last: Jeblee
+email: sjeblee@cs.cmu.edu
+leaderboard: sjeblee
+languages: [eng,spa,ara]
