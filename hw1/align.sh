@@ -4,7 +4,7 @@ echo "compiling..."
 javac IbmModel1.java
 
 echo "aligning..."
-java -Xms2300m -Xmx2300m IbmModel1 data/dev-test-train.de-en data/dev.align
+java -Xms2500m -Xmx2500m IbmModel1 data/dev-test-train.de-en data/dev.align
 
 #echo "alignment done, processing files"
 #cat data/dev.align output.txt > temp
