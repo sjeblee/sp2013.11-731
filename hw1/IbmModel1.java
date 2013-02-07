@@ -21,9 +21,11 @@ public static void main(String[] args){
 	//data structures
 	ArrayList<String> sentences = new ArrayList<String>();
 	HashMap<String,Double> efprob = new HashMap<String,Double>();
+	HashMap<String,Double> feprob = new HashMap<String,Double>();
 	HashMap<String,Double> decount = new HashMap<String,Double>();
 	HashMap<String,Double> efcount = new HashMap<String,Double>();
-	HashMap<String,Integer> ecount = new HashMap<String,Integer>();
+	HashMap<String,Double> fecount = new HashMap<String,Double>();
+	HashMap<String,Double> encount = new HashMap<String,Double>();
 	/*double[] jumpwidth = new double[100];
 	for(int jw=0; jw<100; jw++)
 		jumpwidth[jw] = 0.001;
@@ -57,9 +59,11 @@ public static void main(String[] args){
 			for(String deword : delist){
 				decount.put(deword, 0.0);
 				for(String enword : enlist){
-					ecount.put(enword, 0);
+					encount.put(enword, 0.0);
 					efcount.put(enword + " " + deword, 0.0);
 					efprob.put(enword + " " + deword, 0.0);
+					fecount.put(enword + " " + deword, 0.0);
+					feprob.put(enword + " " + deword, 0.0);
 				}
 			}
 			counter++;
@@ -71,30 +75,50 @@ public static void main(String[] args){
 		System.out.println(e.getMessage());
 	}
 
+	/* EM */
 	System.out.println("\nRunning EM...");
-	
+
  	// initialize t(e|f) uniformly
 	Set<String> tef = efprob.keySet();
 	double efsize = (double) efprob.size();
 	for(String ef : tef)
 		efprob.put(ef, 1.0 / efsize);
+
+	//F|E
+	Set<String> tfe = feprob.keySet();
+	double fesize = (double) feprob.size();
+	for(String fe : tfe)
+		feprob.put(fe, 1.0 / fesize);
 	
 	//do until convergence
 	for(int x=0; x<5; x++){
 		System.out.println("\titeration " + x);
 
-		HashMap<String,Double> total_s = new HashMap<String,Double>();
-	
+		// E | F
+		HashMap<String,Double> total_se = new HashMap<String,Double>();
   		// set count(e|f) to 0 for all e,f
 		Set<String> allef = efcount.keySet();	//assume all other pairs are never observed
 		for(String ende : allef){
 			efcount.put(ende, 0.0);
 		}			
-
   		// set total(f) to 0 for all f
 		Set<String> countsf = decount.keySet();
 		for(String c : countsf)
 			decount.put(c, 0.0);
+
+		// F | E
+		HashMap<String,Double> total_sf = new HashMap<String,Double>();
+  		// set count(f|e) to 0 for all e,f
+		Set<String> allfe = fecount.keySet();	//assume all other pairs are never observed
+		for(String deen : allfe){
+			fecount.put(deen, 0.0);
+		}			
+  		// set total(e) to 0 for all e
+		Set<String> countse = encount.keySet();
+		for(String c : countse)
+			encount.put(c, 0.0);
+
+		//BOTH
    		//for all sentence pairs (e_s,f_s)
  		for(String line : sentences){
 
@@ -109,46 +133,71 @@ public static void main(String[] args){
 				delist.add(detok.nextToken());
 			while(entok.hasMoreTokens())
 				enlist.add(entok.nextToken());
-		
+
+			//E|F
     			// set total_s(e) = 0 for all e
 			for(String e : enlist)
-				total_s.put(e, 0.0);
-
+				total_se.put(e, 0.0);
    			// for all words e in e_s
 			for(String e : enlist){
     				//for all words f in f_s
 				for(String f : delist){
     					//total_s(e) += t(e|f)
-					total_s.put(e, total_s.get(e) + efprob.get(e + " " + f));
+					total_se.put(e, total_se.get(e) + efprob.get(e + " " + f));
 				}
 			}
-	
     			// for all words e in e_s
 			for(String e : enlist){
     				//for all words f in f_s
 				for(String f : delist){
 					String ef = e + " " + f;
     		 			//count(e|f) += t(e|f) / total_s(e)
-					efcount.put(ef, efcount.get(ef) + (efprob.get(ef)/total_s.get(e)));
+					efcount.put(ef, efcount.get(ef) + (efprob.get(ef)/total_se.get(e)));
      		 			//total(f)   += t(e|f) / total_s(e)
-					decount.put(f, decount.get(f) + (efprob.get(ef)/total_s.get(e)));
+					decount.put(f, decount.get(f) + (efprob.get(ef)/total_se.get(e)));
+				}
+			}
+
+			// F |E
+    			// set total_s(f) = 0 for all f
+			for(String f : delist)
+				total_sf.put(f, 0.0);
+   			// for all words f in f_s
+			for(String f : delist){
+    				//for all words e in e_s
+				for(String e : enlist){
+    					//total_s(f) += t(f|e)
+					total_sf.put(f, total_sf.get(f) + feprob.get(f + " " + e));
+				}
+			}
+    			// for all words f in f_s
+			for(String f : delist){
+    				//for all words e in e_s
+				for(String e : enlist){
+					String fe = f + " " + e;
+    		 			//count(f|e) += t(f|e) / total_s(f)
+					efcount.put(fe, fecount.get(fe) + (feprob.get(fe)/total_sf.get(f)));
+     		 			//total(e)   += t(f|e) / total_s(f)
+					encount.put(e, encount.get(e) + (feprob.get(fe)/total_sf.get(f)));
 				}
 			}
 		}//end for all esfs
 	
- 		// for all f
-		/*Set<String> allf = decount.keySet();
-		for(String deword : allf){
-			// for all e
-			Set<String> alle = ecount.keySet();
-			for(String enword : alle){
-		*/
-		//Set<String> allef = efprob.keySet();	//assume all other pairs are never observed
+		//E|F
 		for(String ende : allef){
 				//t(e|f) = count(e|f) / total(f)
 				String deword = ende.substring(ende.indexOf(' ')+1);
 				efprob.put(ende, efcount.get(ende) / decount.get(deword));
+		}
+
+	
+		//F|E
+		for(String deen : allfe){
+				//t(f|e) = count(f|e) / total(e)
+				String enword = deen.substring(deen.indexOf(' ')+1);
+				feprob.put(deen, fecount.get(deen) / encount.get(enword));
 		}	
+    	
     
 	}//end for x iterations
 
@@ -175,8 +224,10 @@ public static void main(String[] args){
 			String e = enlist.get(eindex);
 			for(int findex=0; findex<delist.size(); findex++){
 				String ef = e + " " + delist.get(findex);
-				if(efprob.get(ef) > bestprob){
-					bestprob = efprob.get(ef);
+				String fe = delist.get(findex) + " " + e;
+				double prob = efprob.get(ef)*feprob.get(fe);
+				if(prob > bestprob){
+					bestprob = prob;
 					bestindex = findex;
 				}
 			}//end for de
