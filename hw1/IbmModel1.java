@@ -11,7 +11,7 @@ public class IbmModel1{
 
 public static void main(String[] args){
 
-	long starttime = System.getTimeMillis();
+	long starttime = System.currentTimeMillis();
 
 	if(args.length < 2){
 		System.out.println("Usage: java Align sentences dev-alignments");
@@ -36,9 +36,9 @@ public static void main(String[] args){
 		while(alignfile.hasNextLine()){
 		} */
 		int counter = 0;
-		while(infile.hasNextLine()){
+		while(infile.hasNextLine() && counter < 10000){
 			if((counter%10000) == 0)
-				System.out.print("\n" + count/1000);
+				System.out.print("\n" + counter/1000);
 			else if((counter%1000) == 0)
 				System.out.print(".");
 			String line = infile.nextLine();
@@ -55,6 +55,7 @@ public static void main(String[] args){
 			while(entok.hasMoreTokens())
 				enlist.add(entok.nextToken());
 			for(String deword : delist){
+				decount.put(deword, 0.0);
 				for(String enword : enlist){
 					ecount.put(enword, 0);
 					efcount.put(enword + " " + deword, 0.0);
@@ -80,13 +81,16 @@ public static void main(String[] args){
 	
 	//do until convergence
 	for(int x=0; x<5; x++){
+		System.out.println("\titeration " + x);
 
 		HashMap<String,Double> total_s = new HashMap<String,Double>();
 	
   		// set count(e|f) to 0 for all e,f
-		Set<String> countsef = efcount.keySet();
-		for(String c : countsef)
-			efcount.put(c, 0.0);
+		Set<String> allef = efcount.keySet();	//assume all other pairs are never observed
+		for(String ende : allef){
+			efcount.put(ende, 0.0);
+		}			
+
   		// set total(f) to 0 for all f
 		Set<String> countsf = decount.keySet();
 		for(String c : countsf)
@@ -133,15 +137,17 @@ public static void main(String[] args){
 		}//end for all esfs
 	
  		// for all f
-		Set<String> allf = decount.keySet();
+		/*Set<String> allf = decount.keySet();
 		for(String deword : allf){
 			// for all e
 			Set<String> alle = ecount.keySet();
 			for(String enword : alle){
+		*/
+		//Set<String> allef = efprob.keySet();	//assume all other pairs are never observed
+		for(String ende : allef){
 				//t(e|f) = count(e|f) / total(f)
-				String ende = enword + " " + deword;
+				String deword = ende.substring(ende.indexOf(' ')+1);
 				efprob.put(ende, efcount.get(ende) / decount.get(deword));
-			}
 		}	
     
 	}//end for x iterations
@@ -188,7 +194,7 @@ public static void main(String[] args){
 		System.out.println(e.getMessage());
 	}
 	
-	long endtime = System.getTimeMillis();
+	long endtime = System.currentTimeMillis();
 	long time = endtime - starttime;
 	double printtime = ((double)time) / 1000;
 	printtime = printtime / 60.0;
