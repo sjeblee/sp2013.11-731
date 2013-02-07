@@ -37,7 +37,7 @@ public class IbmModel1 {
 			 * while(alignfile.hasNextLine()){ }
 			 */
 			int counter = 0;
-			while (infile.hasNextLine() && counter < 12000) {
+			while (infile.hasNextLine() && counter < 15000) {
 				if ((counter % 10000) == 0)
 					System.out.print("\n" + counter / 1000);
 				else if ((counter % 1000) == 0)
@@ -81,7 +81,7 @@ public class IbmModel1 {
 			efprob.put(ef, 1.0 / efsize);
 
 		// do until convergence
-		for (int x = 0; x < 6; x++) {
+		for (int x = 0; x < 12; x++) {
 			System.out.println("\titeration " + x);
 
 			HashMap<String, Double> total_s = new HashMap<String, Double>();
