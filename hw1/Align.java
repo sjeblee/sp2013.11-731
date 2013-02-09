@@ -41,7 +41,7 @@ public static void main(String[] args){
 			String line = infile.nextLine();
 			sentences.add(line); // save sentences
 
-			System.out.println(line);
+			//System.out.println(line);
 
 			int barindex = line.indexOf("|||");
 			String de = line.substring(0, barindex);
@@ -175,11 +175,11 @@ public static void main(String[] args){
 					for(int x=0; x<D; x++)
 						sum += jumpwidth.get(x - jprime);
 					if(j == 0)
-						transprob.put(key, 0.01);
+						transprob.put(key, 0.005);
 					else{
 						transprob.put(key, jumpwidth.get(j - jprime) / (double) sum);
 						//smooth prob
-						transprob.put(key, 0.99*((0.00001/((double) D)) + (0.99999*transprob.get(key))) );
+						transprob.put(key, 0.995*((0.00001/((double) D)) + (0.99999*transprob.get(key))) );
 					}//end else
 				}
 			}
