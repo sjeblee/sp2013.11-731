@@ -1,14 +1,10 @@
 #!/bin/bash
 
 echo "compiling..."
-javac IbmModel1.java
+javac Align.java
 
 echo "aligning..."
-java -Xms2500m -Xmx2500m IbmModel1 data/dev-test-train.de-en data/dev.align
-
-#echo "alignment done, processing files"
-#cat data/dev.align output.txt > temp
-#sed 's/?/-/g' < temp > output.txt
+java -Xms2500m -Xmx2500m Align data/dev-test-train.de-en data/dev.align
 
 echo "checking..."
 ./check < output.txt > output.al
