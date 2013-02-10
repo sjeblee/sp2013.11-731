@@ -175,11 +175,11 @@ public static void main(String[] args){
 					for(int x=0; x<D; x++)
 						sum += jumpwidth.get(x - jprime);
 					if(j == 0)
-						transprob.put(key, 0.005);
+						transprob.put(key, 0.01);
 					else{
 						transprob.put(key, jumpwidth.get(j - jprime) / (double) sum);
 						//smooth prob
-						transprob.put(key, 0.995*((0.00001/((double) D)) + (0.99999*transprob.get(key))) );
+						transprob.put(key, 0.99*((0.00001/((double) D)) + (0.99999*transprob.get(key))) );
 					}//end else
 				}
 			}
