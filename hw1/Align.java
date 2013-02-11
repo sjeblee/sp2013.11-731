@@ -123,7 +123,7 @@ public class Align {
 			alignfile.close();
 
 			int counter = 0;
-			while (infile.hasNextLine() && counter < 15000) {
+			while (infile.hasNextLine() && counter < 30000) {
 				if ((counter % 10000) == 0)
 					System.out.print("\n" + counter / 1000);
 				else if ((counter % 1000) == 0)
@@ -163,10 +163,10 @@ public class Align {
 			System.out.println(e.getMessage());
 		}
 
-		Set<Integer> set = jumpwidth.keySet();
-		for (int index : set) {
-			System.out.println(index + ": " + jumpwidth.get(index));
-		}
+		//Set<Integer> set = jumpwidth.keySet();
+		//for (int index : set) {
+		//	System.out.println(index + ": " + jumpwidth.get(index));
+		//}
 
 		// calculate transition probs
 		for (int D = 2; D <= maxD; D++) {
