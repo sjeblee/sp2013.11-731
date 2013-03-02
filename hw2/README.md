@@ -1,19 +1,8 @@
-There are three Python programs here (`-h` for usage):
+Weston Feely
+Serena Jeblee
+MT Homework 2
 
- - `./evaluate` evaluates pairs of MT output hypotheses relative to a reference translation using counts of matched words
- - `./check` checks that the output file is correctly formatted
- - `./grade` computes the accuracy
-
-The commands are designed to work in a pipeline. For instance, this is a valid invocation:
-
-    ./evaluate | ./check | ./grade
-
-
-The `data/` directory contains a training set and a test set
-
- - `data/train.hyp1-hyp2-ref` is a file containing tuples of two translation hypotheses and a human (gold standard) translation.
-
- - `data/train.gold` contains gold standard human judgements indicating whether the first hypothesis (hyp1) or the second hypothesis (hyp2) is better or equally good/bad.
-
- - `data/test.hyp1-hyp2-ref` is a blind test set containing tuples of two translation hypotheses and a human (gold standard) translation. You will be graded on how well your predictions correlate with human judgements.
-
+2/15 - First commit, using given evaluation metric.
+2/15 - Wrote python script to evaluate using simple METEOR metric.
+2/21 - Added BLEU metric (with ngrams 1 through 4) to evaluation script. Score is now based on a mix of BLEU and simple METEOR.
+3/2 - Pre-processed data using TurboParser2.0 tokenizer and POS tagger. Integrated WordNet information for METEOR synonym matching.

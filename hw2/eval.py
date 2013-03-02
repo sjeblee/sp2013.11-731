@@ -1,8 +1,8 @@
 #!/usr/bin/python
 #eval.py
 #Weston Feely
-#2/22/13
-import sys
+#3/2/13
+import sys,re
 from time import time
 from collections import Counter	
 
@@ -36,15 +36,14 @@ class WN(object):
 		#print '#Unique words='+str(len(self.word_to_ids))
 	def get_synonyms(self,word):
 		syns = set([])
-		word_variants = [word+pos for pos in ['.adj','.adv','.noun','.verb']]
-		for variant in word_variants:
-			#Check if word+pos tag is in hash
-			if variant in self.word_to_ids:
-				#Loop through IDs corresponding to this variant
-				for ID in self.word_to_ids[variant]:
-					#Add synonyms to list
-					syns = syns | self.id_to_words[ID]
-		#print "Synonyms: "+word+': '+' '.join(syns)
+		#Check if word is in hash
+		if word in self.word_to_ids:
+			#Loop through IDs corresponding to this word
+			for ID in self.word_to_ids[word]:
+				#Add synonyms to list
+				syns = syns | self.id_to_words[ID]
+		#if syns != set([]):
+		#	print "Synonyms: "+word+' : '+' '.join(syns)
 		return syns
 
 '''Returns ngrams of given order for a sentence, as a list of words'''
@@ -59,8 +58,31 @@ def get_ngrams(sent,n):
 		ngrams.append(buff.rstrip())
 	return ngrams
 
+'''Converts a word+Penn POS tag combo (dog.NN) into a wordnet POS tag combo (dog.noun) for all words in a list'''
+def penn_to_wn_tags(pennlist):
+	wnlist = []
+	for pennword in pennlist:
+		word_and_pos = pennword.split('_')
+		wnword = word_and_pos[0]
+		#Check Penn POS tag for noun
+		if word_and_pos[1][0] == 'N':
+			wnword = wnword+'.noun'
+		#Check Penn POS tag for verb
+		elif word_and_pos[1][0] == 'V':
+			wnword = wnword+'.verb'
+		#Check Penn POS tag for adjective
+		elif word_and_pos[1][0] == 'J':
+			wnword = wnword+'.adj'
+		#Check Penn POS tag for adverb
+		elif word_and_pos[1][0:2] == 'RB':
+			wnword = wnword+'.adv'
+		wnlist.append(wnword)
+	return wnlist
+
 '''BLEU metric for single reference'''
 def bleu(hyp,ref,order):
+	hyp = hyp.split()
+	ref = ref.split()
 	#Check order against length of each sentence
 	order = min(len(hyp),len(ref),order)
 	#Get shared unigrams in hyp and ref
@@ -103,6 +125,11 @@ def bleu(hyp,ref,order):
 
 '''Simple METEOR metric'''
 def meteor(hyp,ref,wordnet):
+	hyp = hyp.split()
+	ref = ref.split()
+	#Convert tags
+	hyp = penn_to_wn_tags(hyp)
+	ref = penn_to_wn_tags(ref)
 	#Turn input lists into counters
 	hyp_count = Counter(hyp)
 	ref_count = Counter(ref)
@@ -114,18 +141,13 @@ def meteor(hyp,ref,wordnet):
 	#Check for WordNet synonyms
 	for word in list(hyp_count.elements()):
 		for poss in wordnet.get_synonyms(word):
-			#Remove POS tag from possible synonyms
-			if (poss[-4:] == 'noun') or (poss[-4:] == 'verb'):
-				poss = poss[0:-5]
-			else:
-				poss = poss[0:-4]
 			#Check for matching synonym
 			if poss in ref_count:
-				#print "SYNONYM DETECTION!"
-				#print poss+' '+word
+				#print 'Synonym Match: "'+poss+'" is a synonym of "'+word+'"'
 				unigrams.append(poss)
 				ref_count = ref_count - Counter([poss])
 				hyp_count = hyp_count - Counter([word])
+				break
 	#Calculate precision and recall
 	p = len(unigrams)/float(len(hyp)) # precision
 	r = len(unigrams)/float(len(ref)) # recall
@@ -138,17 +160,21 @@ def meteor(hyp,ref,wordnet):
 def evaluate(triple,wordnet,i):
 	#Unpack triple and split each sentence into list of words
 	h1,h2,e = triple
-	h1 = h1.split()
-	h2 = h2.split()
-	e = e.split()
-	#Score both hypotheses
 	if i % 1000 == 0:
 		sys.stdout.write('.')
 		sys.stdout.flush()
-	#score1 = (0.3*bleu(h1,e,3))+(0.7*meteor(h1,e,wordnet))
-	#score2 = (0.3*bleu(h2,e,3))+(0.7*meteor(h2,e,wordnet))
-	score1 = meteor(h1,e,wordnet)
-	score2 = meteor(h2,e,wordnet)	
+	#Create "clean" version of each sentence, without POS tags, for BLEU
+	h1_clean = re.sub('\_\S+\s',' ',h1)
+	h1_clean.strip()
+	h2_clean = re.sub('\_\S+\s',' ',h2)
+	h2_clean.strip()
+	e_clean = re.sub('\_\S+\s',' ',e)
+	e_clean.strip()
+	#Score both hypotheses	
+	score1 = (0.3*bleu(h1_clean,e_clean,3))+(0.7*meteor(h1,e,wordnet))
+	score2 = (0.3*bleu(h2_clean,e_clean,3))+(0.7*meteor(h2,e,wordnet))
+	#score1 = meteor(h1,e,wordnet)
+	#score2 = meteor(h2,e,wordnet)
 	#Return result, indicating best hypothesis
 	result = '0'
 	if score1 > score2:
@@ -174,7 +200,8 @@ def main(args):
 		gold = open('data/train.gold').readlines()
 	elif str(args[1]) == 'test':
 		print 'Reading test data from file...'
-		data = open('data/test.hyp1-hyp2-ref').readlines()
+		#data = open('data/test.hyp1-hyp2-ref').readlines()
+		data = open('data/test.tagged').readlines()
 	else:
 		print 'Usage: python eval.py train|test'
 		return 1
