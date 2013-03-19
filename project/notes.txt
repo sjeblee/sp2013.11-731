@@ -50,33 +50,6 @@ Post-break:
 
 
 
-Discourse
-- user acceptability - what features matter?
-	- detect hostility
-	- all caps
-	- violent words
-	- volume of swear words
-	- volume of agreement words (yeah, agree, i think so)
-		vs disagreement words (no, not, ain't)
-- percent of racist/sexist posts versus posts against racism/sexism
-	- cross-reference list of racist users w sexist users
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
