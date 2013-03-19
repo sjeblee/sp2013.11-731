@@ -1,0 +1,13 @@
+MT Project
+Egyptian Morphological Analyzer Notes
+
+TODO:
+
+- negation circumfix ma-sh
+- assimilation of words that end and start with the same letter
+  ex: qal laha -> qalaha
+
+
+Margaret Omar - Egyptian and Levantine Arabic: A Comparative Study
+http://babel.hathitrust.org/cgi/pt?id=mdp.39015014575255;seq=19;view=1up;num=5
+
