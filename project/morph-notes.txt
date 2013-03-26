@@ -7,7 +7,44 @@ TODO:
 - assimilation of words that end and start with the same letter
   ex: qal laha -> qalaha
 
-
 Margaret Omar - Egyptian and Levantine Arabic: A Comparative Study
 http://babel.hathitrust.org/cgi/pt?id=mdp.39015014575255;seq=19;view=1up;num=5
+
+NOTE: When citing MADA or TOKAN in your own publications, please be sure 
+to include the version number and what version of SAMA, BAMA or Aramorph 
+you used. This is important because different versions can produce 
+significantly different results, and therefore the version must be considered 
+when comparing to previous work.
+
+MADA Installation:
+
+add to Path: /home/serena/SVMtool/SVMTool-1.3/bin
+Done: export PERL5LIB=~/SVMtool/SVMTool-1.3/lib:$PERL5LIB
+Done: install SVMtool
+Done: install SRILM
+Done: install Aramorph
+
+perl INSTALL.pl madahome=/home/serena/Documents/Spring2013/MachineTranslation/github/sp2013.11-731/project/MADA-3.2 \
+srihome=/home/serena/SRILM svmhome=/home/serena/SVMtool/SVMTool-1.3.1 xamadir=/home/serena/Aramorph/aramorph-1.2.1 xamaversion=ARAMORPH1.2.1
+
+perl MADA+TOKAN.pl config=config-files/template.madaconfig file=/home/serena/Documents/Spring2013/MachineTranslation/github/sp2013.11-731/project/data/egy.txt outputdir=output
+
+Done: write script to convert MADA output back to Arabic with split off things
+	if word == @@@@, take next Arabic word
+	if word has a +, split off corresponding letters from next word, check for + after next word, if not, print rest of next word
+		if yes, split off end of word, print middle, print end
+		if not, print whole word
+
+PROBLEM: MADA output way too short!
+
+
+
+
+
+
+
+
+
+
+
 
