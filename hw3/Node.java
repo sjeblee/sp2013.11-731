@@ -20,6 +20,28 @@ public Node(String n, double score, Node p){
 	parent = p;
 }
 
+public ArrayList<String> history(){
+	ArrayList<String> histcopy = new ArrayList<String>();
+	for(String s : this.history){
+		histcopy.add(s);
+	}
+	return histcopy;
+}
+
+public int[] coverage(){
+	int[] arr = new int[this.coverage.length];
+	for(int i=0; i<arr.length; i++)
+		arr[i] = coverage[i];
+	return arr;
+}
+
+public String historystring(){
+	String h = "";
+	for(String s : this.history)
+		h += s + " ";
+	return h.trim();
+}
+
 public String toString(){
 	String s = name + " " + prob + " ";
 	for(int i=0; i<coverage.length; i++){
