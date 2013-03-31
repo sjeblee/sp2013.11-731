@@ -1,7 +1,7 @@
 /** MishMishDec.java
 * MT HW 3
 * Weston Feely & Serena Jeblee
-* Last Modified: 27 Mar 2013
+* Last Modified: 30 Mar 2013
 */
 
 import java.io.*;
@@ -11,17 +11,21 @@ public class MishMishDec{
 
 public static HashMap<String, Pair<Double, Double>> lm;
 public static HashMap<String, ArrayList<Pair<String, Double>>> tm;
+public static int r;
 
 public static void main(String[] args){
 
-	if(args.length < 3){
-		System.out.println("Usage: java MishMishDec data languagemodel translationmodel");
+	if(args.length < 4){
+		System.out.println("Usage: java MishMishDec data languagemodel translationmodel reorder-distance");
 		System.exit(1);
 	}
+
+	long starttime = System.currentTimeMillis();
 
 	String datafile = args[0];
 	String lmfile = args[1];
 	String tmfile = args[2];
+	r = Integer.parseInt(args[3]);
 	
 	try{
 
@@ -30,9 +34,9 @@ public static void main(String[] args){
 		tm = readTM(tmfile);
 
 		//Read in heuristic hypotheses
-		Scanner hypin = new Scanner(new FileReader("hypotheses.txt"));
+		Scanner hypin = new Scanner(new FileReader("science.txt"));
 		Scanner infile = new Scanner(new FileReader(datafile));
-		FileWriter outfile = new FileWriter("output3.txt");
+		FileWriter outfile = new FileWriter("output" + r + ".txt");
 		int counter = 0;
 		while(infile.hasNextLine()){
 			String line = infile.nextLine();
@@ -55,6 +59,11 @@ public static void main(String[] args){
 	catch(IOException e){
 		System.out.println(e.getMessage());
 	}
+
+	long endtime = System.currentTimeMillis();
+	long time = endtime - starttime;
+	double timemins = (((double)time) / 1000) /60;
+	System.out.println("Total time: " + timemins + " mins");
 
 }//end main
 
@@ -139,15 +148,15 @@ public static double getLMscore(String sentence){
 	while(tok.hasMoreTokens())
 		words.add(tok.nextToken());
 	double score = 0.0;
-	for(int i=0; i<words.size(); i++){
+	for(int i=0; i<words.size()-2; i++){
 		String s;
-		if(i>=2)
-			s = words.get(i-2) + " " + words.get(i-1) + " " + words.get(i);
-		else if(i>=1)
-			s = words.get(i-1) + " " + words.get(i); 
-		else 
+		/*if(i == words.size()-1)
 			s = words.get(i);
-
+		else if(i == words.size()-2)
+			s = words.get(i) + " " + words.get(i+1);
+		*/
+		s = words.get(i) + " " + words.get(i+1) + " " + words.get(i+2);
+		
 		//get trigram score
 		try{
 			Pair<Double,Double> pair = lm.get(s);
@@ -191,12 +200,15 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 	ArrayList<Node> init_stack = new ArrayList<Node>();
 	int stackindex = 1;
 	int numstacks = unigrams.size(); // #stacks = 0, 1 through numstacks
+	System.out.println("numstacks: " + numstacks);
 
 	//get heuristic hypothesis
 	double hypscore = Double.parseDouble(hyp.substring(0, hyp.indexOf(' ')));
 	hyp = hyp.substring(hyp.indexOf(' '));
 	double hyplmscore = getLMscore(hyp);
-	System.out.println("hyplmscore = " + hyplmscore);
+	double hyptotalscore = hypscore + hyplmscore;
+	System.out.println("hyp = " + hyp + "\ntmscore: " + hypscore + "\nlmscore: " + hyplmscore);
+	System.out.println("hypscore = " + hyptotalscore);
 	
 	ArrayList<ArrayList<Node>> stacks = new ArrayList<ArrayList<Node>>();
 	//initialize stacks
@@ -209,20 +221,30 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 	for(int i=0; i<numstacks; i++)
 		nullnode.coverage[i] = 0;
 	nullnode.history = new ArrayList<String>();
-	nullnode.prob = 0.0;
+	nullnode.history.add("<s>");
+	nullnode.tmprob = 0.0;
+	nullnode.lmprob = 0.0;
+	nullnode.score = 0.0;
 	stacks.get(0).add(nullnode);
 	
-	int r = 0; //Reorder distance
+	//int r = 1; //Reorder distance
+	int maxsize = 399;
 
 	while(stackindex <= numstacks){
 		System.out.print("Building stack " + stackindex + " : ");
+		Node worstnode = new Node("null", 0.0, null);
+		worstnode.score = 0.0;
+		worstnode.lmprob = 0.0;
+
+		Node initialworst = worstnode;
 
 	for(int s=Math.max(stackindex-1, 0); s>=Math.max(stackindex-3, 0); s--){
 		int ngramorder = stackindex-s; //length of phrase
-		if((stackindex + ngramorder) <= numstacks){
-		//System.out.println("\tcheck ngram order " + ngramorder);
+		//System.out.println("s: " + s + " ngramorder: " + ngramorder);
+		if((stackindex + ngramorder) <= numstacks+1){
+			//System.out.println("\tcheck ngram order " + ngramorder);
 		for(Node node : stacks.get(s)){ //check each potential parent node, enumerate its children
-			for(int i=Math.max(stackindex-1-r, 0); i<=Math.min(stackindex-1+r, numstacks-1); i++){
+			for(int i=Math.max(s-r, 0); i<=Math.min(s+r, numstacks-1); i++){
 				String cov = "";
 				for(int c=i; c<Math.min(i+ngramorder,numstacks); c++)
 					cov += node.coverage[c];
@@ -241,12 +263,12 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 					//System.out.println("\t\tmatches: " + list.size());
 					for(Pair<String, Double> pair : list){
 						//check score against hyp
-						double score = pair.second();
+						double tmscore = pair.second();
 						//System.out.println("\t\tmatch: " + pair.first() + " " + score);
 
 						//make node object, set parent pointer, add to stack
 							String phrase = pair.first();
-							Node n = new Node(phrase, score+node.prob, node);
+							Node n = new Node(phrase, tmscore+node.tmprob, node);	//add new node, update prob
 							n.coverage = n.parent.coverage();
 							for(int c=i; c<Math.min(i+ngramorder,numstacks); c++)
 								n.coverage[c] = 1;
@@ -256,9 +278,14 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 								n.history.add(phrasetok.nextToken());
 
 							double lmscore = getLMscore(n.historystring());
+							n.lmprob = lmscore;
+							n.score = n.lmprob + n.tmprob;
+							//System.out.println("total node score: " + totalscore);
+							//System.out.println(n);
 
-						//if(lmscore >= hyplmscore){
-						if(score >= hypscore){
+						if(n.score >= hyptotalscore){
+						//if((score >= hypscore)){
+							//System.out.println("node score greater than hypscore");
 							
 							//check stack for duplicates
 							if((stackindex > 1) && (n.history.size()>=2)){
@@ -281,10 +308,11 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 										}
 										//System.out.println("\t\t\tcomparing " + hist + " " + ncov);
 										//System.out.println("\t\t\t and " + stackhist + " " + sncov);
-										if(stackhist.equals(hist) || ncov.equals(sncov)){ //duplicate found!
+										if(stackhist.equals(hist) || ncov.equals(sncov)){ //duplicate found! 
+											//
 											//System.out.println("\t\t\tduplicate!");
 											dup = true;
-											if(stacknode.prob < n.prob){
+											if((stacknode.score) < (n.score)){
 												removeindex = stacks.get(stackindex).indexOf(stacknode);
 												//stacks.get(stackindex).add(n);
 												break;
@@ -293,13 +321,40 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 									}//end if stacknode.history.size() >=2
 								}//end for stacknode in stack
 								if(dup && (removeindex >= 0)){
+									Node rn = stacks.get(stackindex).get(removeindex);
 									stacks.get(stackindex).remove(removeindex);
 									//System.out.println("\t\t\tremoved old node");
 									stacks.get(stackindex).add(n);
+									if(n.score < worstnode.score)
+										worstnode = n;
+									if(rn == worstnode){
+										worstnode = initialworst;
+										for(Node sn : stacks.get(stackindex)){ //reset worstnode
+											if(sn.score < worstnode.score)
+												worstnode = sn;
+										}
+									}
 									//System.out.println("\t\t\tadded new node");
 								}
 								else if(!dup){
-									stacks.get(stackindex).add(n);
+									if(stacks.get(stackindex).size()>maxsize){
+										if(n.score > worstnode.score){ //only add it if it's not worse
+											stacks.get(stackindex).add(n);
+											boolean bool = stacks.get(stackindex).remove(worstnode); //drop worst
+											if(!bool)
+												System.out.println("\tWARNING: worstnode not removed!");
+											worstnode = initialworst;
+											for(Node sn : stacks.get(stackindex)){ //reset worstnode
+												if(sn.score < worstnode.score)
+													worstnode = sn;
+											}
+										}//end if n.score > worstnode.score
+									}
+									else{
+										stacks.get(stackindex).add(n);
+										if(n.score < worstnode.score) //reset worstnode
+											worstnode = n;
+									}
 									//System.out.println("\t\t\tadded new node");
 								}
 								//else dup && remove = -1, keep old one, don't add new, nothing to do
@@ -314,8 +369,8 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 	}//end for s
 
 	System.out.println("Added " + stacks.get(stackindex).size() + " nodes");
-	for(Node n : stacks.get(stackindex))
-		System.out.println(n);
+	//for(Node n : stacks.get(stackindex))
+	//	System.out.println(n);
 	stackindex++;
 	}//end while stackindex <= numstacks
 
@@ -323,8 +378,11 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 	Node bestnode = null;
 	//System.out.println("hypscore: " + hypscore);
 	for(Node n : stacks.get(numstacks)){
-		System.out.println("node: " + n.toString());
+		n.history.add("</s>");
+		System.out.println(n);
 		String hist = n.historystring();
+		n.lmprob = getLMscore(hist);
+		n.score = n.lmprob + n.tmprob;
 		boolean full = true;
 		/*for(int c=0; c<n.coverage.length; c++){	 //check to make sure translation covers all words
 			if(n.coverage[c] == 0){
@@ -336,15 +394,17 @@ public static String search(ArrayList<String> unigrams, String hyp, HashMap<Stri
 
 		//compute lm score
 		if(full){
-			double lmscore = getLMscore(hist);
-			if(lmscore >= bestscore){
+			double score = n.score;
+			if(score >= bestscore){
 				bestnode = n;
-				bestscore = lmscore;
+				bestscore = score;
 			}//end if lmscore
 		}//end if full
 	}//end for node n
 
-	String result = bestnode.historystring();
+	String result = hyp;
+	if(bestnode != null)
+		result = bestnode.historystring();
 	System.out.println("best: " + bestscore + "\n" + result);
 	return result;
 }//end search
