@@ -1,18 +1,10 @@
-There are three Python programs here (`-h` for usage):
+Weston Feely
+Serena Jeblee
+MT Homework 3
 
- - `./decode` a simple non-reordering (monotone) phrase-based decoder
- - `./grade` computes the model score of your output
-
-The commands are designed to work in a pipeline. For instance, this is a valid invocation:
-
-    ./decode | ./grade
-
-
-The `data/` directory contains the input set to be decoded and the models
-
- - `data/input` is the input text
-
- - `data/lm` is the ARPA-format 3-gram language model
-
- - `data/tm` is the phrase translation model
-
+3/14 - First commit, pushed output of default decoder to github.
+3/26 - Made a program to generate hypotheses for A* search.
+3/30 - Made a beam-search stack decoder in Java that allows for reordering, does recombination, and uses histogram pruning.
+3/31 - Tested various reorderings and histogram pruning sizes.
+4/1 - Realized two mistakes: (1) recombination was being done incorrectly, fixed this; (2) decoder was greedy, fixed this by we calculating future cost.
+4/2 - Gave up on Java decoder, edited given python "decode" to pass baseline.
