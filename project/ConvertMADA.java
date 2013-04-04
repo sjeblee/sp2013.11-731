@@ -24,6 +24,7 @@ public static void main(String[] args){
 		Scanner madafile = new Scanner(new FileReader(madafilename));
 		FileWriter outfile = new FileWriter(filename + ".mada");
 		String buffer = "";
+		int linenum = 1;
 
 		while(infile.hasNextLine() && madafile.hasNextLine()){
 			String line = infile.nextLine();
@@ -39,20 +40,48 @@ public static void main(String[] args){
 			madaline = newline;
 			newline = "";
 
+			//fix mada output
+			madaline = madaline.replaceAll("(\\. +)+", "\\.");
+			madaline = madaline.replaceAll("(\\? )+", "?");
+			madaline = madaline.replaceAll("@@ء@@", "");
+			madaline = madaline.replaceAll("- -", "--");
+	
+			//fix original file
+			line = line.replaceAll("…", ".");
+			line = line.replaceAll("\\.+", " . ");
+			line = line.replaceAll("“", " “ ");
+			line = line.replaceAll("”", " ” ");
+			line = line.replaceAll(" +", " ");	//fix duplicate spaces
+			line = line.replaceAll("؟؟", "?");
+			
+			if(line.contains(".وحمد"))
+				line = line.replaceAll("\\.وحمد", ". وحمد");
+
 			//Match @@ to original
 			StringTokenizer tok = new StringTokenizer(line);
 			StringTokenizer madatok = new StringTokenizer(madaline);
+			//System.out.println(linenum + " mada: " + madaline + "\norig: " + line);
 			while(madatok.hasMoreTokens()){
 				String madaword = madatok.nextToken();
+				//System.out.print("madaword: " + madaword);
+				//if(madaword.equals(",") || madaword.equals("\"") || madaword.equals("-"))
+				//	newline += madaword + " ";
 				if(madaword.contains("@")){
-					newline += tok.nextToken() + " ";
+					String w = tok.nextToken();
+					//System.out.println(" match: " + w);
+					newline += w + " ";
 				}
 				else{
-					if((madaword.charAt(madaword.length()) == '+') 
-						|| (madaword.charAt(0) == '+'))		//skip past clitics
+					if((madaword.charAt(madaword.length()-1) == '+') 
+						|| (madaword.charAt(0) == '+')){	//skip past clitics
 						newline += madaword + " ";
+						//System.out.println(" (skipped clitic)");
+					}
 					else{
-						tok.nextToken();		//match base word
+						if(tok.hasMoreTokens()){
+							String wo = tok.nextToken();		//match base word
+							//System.out.println(" match: " + wo + " (used mada)");
+						}
 						newline += madaword + " ";
 					}
 				}
@@ -60,6 +89,7 @@ public static void main(String[] args){
 
 			//write sentence to outfile
 			outfile.write(newline.trim() + "\n");
+			linenum++;
 		}//end while hasNextLine
 
 		infile.close();
