@@ -19,7 +19,7 @@ when comparing to previous work.
 MADA Installation:
 
 add to Path: /home/serena/SVMtool/SVMTool-1.3/bin
-Done: export PERL5LIB=~/SVMtool/SVMTool-1.3/lib:$PERL5LIB
+Done: export PERL5LIB=~/SVMtool/SVMTool-1.3.1/lib:$PERL5LIB
 Done: install SVMtool
 Done: install SRILM
 Done: install Aramorph
@@ -27,7 +27,7 @@ Done: install Aramorph
 perl INSTALL.pl madahome=/home/serena/Documents/Spring2013/MachineTranslation/github/sp2013.11-731/project/MADA-3.2 \
 srihome=/home/serena/SRILM svmhome=/home/serena/SVMtool/SVMTool-1.3.1 xamadir=/home/serena/Aramorph/aramorph-1.2.1 xamaversion=ARAMORPH1.2.1
 
-perl MADA+TOKAN.pl config=config-files/template.madaconfig file=/home/serena/Documents/Spring2013/MachineTranslation/github/sp2013.11-731/project/data/egy.txt outputdir=output
+perl MADA+TOKAN.pl config=config-files/template.madaconfig file=/home/serena/Documents/Spring2013/MachineTranslation/github/sp2013.11-731/project/data/levcorpus.lev outputdir=output/new &> mada_log.txt
 
 Done: write script to convert MADA output back to Arabic with split off things
 	if word == @@@@, take next Arabic word
@@ -35,9 +35,22 @@ Done: write script to convert MADA output back to Arabic with split off things
 		if yes, split off end of word, print middle, print end
 		if not, print whole word
 
-PROBLEM: MADA output way too short!
+PROBLEM: MADA output way too short - removed lines:
 
+line 2232   الريس عفارم عليك . طب من أحسن انا والا السادات ؟
+the president: good for you . OK, who is better, me or the Sadat ?
 
+line 27095 الريس عفارم عليك . طب من أحسن انا والا السادات ؟
+the President Bravo upon you . ok who is better me or ALsadat?
+
+line 4949 - removed comma
+
+line 5871 - يعنى سوف تعطيك «4.5$ 4.5$» نا تج ال «3$» الاستثمار خاصتك تكون النتيجةبعد ١٥
+yEny swf @@@@ " 4.5 $ 4.5 $ " @@nA@@ @@tj@@ @@@@ " 3 $ " AlAstvmAr @@@@ tkwn @@AlntyjpbEd@@ 15
+
+line 6180 - removed quotes from mada output
+
+TODO: preprocess to remove ' ' marks
 
 
 
