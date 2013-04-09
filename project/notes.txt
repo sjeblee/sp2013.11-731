@@ -24,8 +24,8 @@ Over break:
 - Read MADA paper, download MADA, get familiar with usage - Serena (CHECK!)
 - Run Egyptian text through MADA - Serena (CHECK!)
 - Read HIERO paper, GHKM paper, look for open source toolkit - Wes
-- Do Levantine & English data pre-processing - Wes and Serena 
-	TODO: Alif and ya normalization
+- Do Levantine & English data pre-processing - Wes and Serena (CHECK!)
+	Done: Alif and ya normalization -> normalifya.sh
 
 Post-break:
 - Read papers on DA/MSA adaptation
@@ -34,6 +34,13 @@ Post-break:
 - Read Iraqi word segmenter paper - Serena
 - Implement Egyptian word segmenter
 - Stretch goal: Read GHKM paper, implement GHKM, get BLEU scores
+
+Pipeline:
+- data split into egy, lev, and egylev
+- data split into train, dev, and test sets
+- data alif/ya normalized
+- data mada-ified
+- trained and tested Moses
 
 
 
