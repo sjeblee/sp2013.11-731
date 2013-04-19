@@ -1,0 +1,14 @@
+!!!noun.lexc!!!
+
+LEXICON Root
+Noun;
+
+LEXICON NounInf
+0:0 #;
+#add feminine marker
+#masc sound plural
+#feminine sound plural
++ون:^ون #;
+
+LEXICON Noun
+مسلم NounInf;

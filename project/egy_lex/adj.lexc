@@ -1,0 +1,11 @@
+!!!adj.lexc!!!
+
+LEXICON Root
+Adj;
+
+LEXICON AdjInf
+0:0 #;
+
+LEXICON Adj
+اخضر AdjInf;
+ابيض AdjInf;

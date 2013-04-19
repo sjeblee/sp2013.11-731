@@ -1,0 +1,10 @@
+!!!adv.lexc!!!
+
+LEXICON Root
+Adv;
+
+LEXICON AdvInf
+0:0 #;
+
+LEXICON Adv
+دائما AdvInf;

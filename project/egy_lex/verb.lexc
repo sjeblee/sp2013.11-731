@@ -1,0 +1,26 @@
+!!!verb.lexc!!!
+
+LEXICON Root
+Verb;
+
+LEXICON VerbNeg1
++ش:^ش VerbNeg2;
+
+LEXICON VerbNeg2
+ما+:ما^ VerbNeg3;
+م+:م^ VerbNeg3;
+LEXICON VerbNeg3
+0:0 #;
+ب+:ب^ #;
+ح+:ح^ #;
+LEXICON VerbInf
+0:0 #;
+0:0 VerbNeg1;
+
+ب+:ب^ #;
+ح+:ح^ #;
+
+LEXICON Verb
+نام VerbInf;
+كتب VerbInf;
+تكلم VerbInf;

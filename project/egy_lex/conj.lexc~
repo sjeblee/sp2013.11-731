@@ -1,0 +1,10 @@
+!!!conj.lexc!!!
+
+LEXICON Root
+Conj;
+
+LEXICON ConjInf
+0:0 #;
+
+LEXICON Conj
+and ConjInf;
