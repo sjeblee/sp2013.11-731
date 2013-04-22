@@ -8,6 +8,15 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+project/data/
+project/MADA-3.2.tgz
+project/MADA-3.2/
+project/MADA-ARZ-0.4.tgz
+project/MADA-ARZ-0.4/
+project/backup/
+project/calima.sh
+project/mada-output-backup/
+project/madaarz.sh
 
 # Scala-IDE specific
 .scala_dependencies
