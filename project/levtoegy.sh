@@ -5,15 +5,17 @@
 
 #TODO
 #to be able to: fii
-# shuu 'aam verb -> verb eyh
+# Em verb -> verb
+# shw verb -> verb Ayh
+# Aysh verb -> verb Ayh
 # rH verb -> H verb
-# maa verb -> ma-verb-sh
+# mA verb -> mA-verb-sh
 
 #word reordering:
-# imta verb -> verb imta
-# maa verb -> ma-verb-sh : including fii and 'aind
-# Haada, Haadi -> da, di, etc : see pg 17 M.Omar
-# Ha + noun -> noun da/di
+# AmtY verb -> verb AmtY
+# mA verb -> mA-verb-sh : including fy and End
+# HAda, HAdi -> dA, dy, etc : see pg 17 M.Omar
+# HA + noun -> noun dA/dy
 
 file="levantine.txt"
 
@@ -28,3 +30,5 @@ sed 's/ هلق / دلوقتي /g' $file | \ #hallaq to delwa'ti
 sed 's/ منيح / كويس /g' $file | \ #mniiH to kwayis
 #sed 's/رح [a-z] / ح /g' $file | \ #rH verb to H-verb
 sed 's/ مبارح / امبارح /g' $file > lev-converted.txt #mbarH to imbaraH
+
+

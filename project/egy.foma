@@ -1,6 +1,6 @@
 !!!egy.foma!!!
 !Serena Jeblee & Weston Feely
-!4/18/13
+!4/21/13
 
 ! Read in Lexica by POS tag
 read lexc egy_lex/adj.lexc
@@ -15,13 +15,11 @@ read lexc egy_lex/prep.lexc
 define prep;
 read lexc egy_lex/pron.lexc
 define pron;
-read lexc egy_lex/punc.lexc
-define punc;
 read lexc egy_lex/verb.lexc
 define verb;
 
 ! Combine lexica into single lexicon
-regex adj | adv | conj | noun | prep | pron | punc | verb;
+regex adj | adv | conj | noun | prep | verb;
 define Lexicon;
 
 ! Cleanup: remove morpheme boundaries
