@@ -21,7 +21,7 @@ read lexc egy_lex/negverb.lexc
 define negverb;
 
 ! Combine lexica into single lexicon
-regex adj | adv | conj | noun | prep | verb | negverb;
+regex adj | adv | conj | noun | prep | pron | verb | negverb;
 define Lexicon;
 
 ! Cleanup: remove morpheme boundaries
@@ -66,5 +66,5 @@ define Grammar Lexicon		.o.
 regex Grammar;
 
 ! Save into egy.bin and exit
-!save stack egy.bin
-!exit;
+save stack egy.bin
+exit;
