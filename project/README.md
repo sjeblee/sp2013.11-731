@@ -51,3 +51,22 @@ To Do List:
 	- Get precision-recall on test set
 - Run Levantine pre-processor and FOMA analyzer on each data set - Serena
 - Run Moses to get final condition (3)
+
+MOSES Conditions
+- levmada no pluses
+- egylevmada no pluses
+- egy, lev, egylev w/ mish, no pluses
+
+- test all conditions on egy test set
+- analysis only
+- transformation only
+
+LATER
+Egy
+EgyMsa
+EgyLev
+
+
+
+
+
